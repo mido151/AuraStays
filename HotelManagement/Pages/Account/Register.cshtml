@@ -1,0 +1,204 @@
+﻿@page
+@model HotelManagement.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "_Layout";
+}
+
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-2xl w-full">
+        <div class="glassmorphism rounded-2xl p-8 shadow-2xl">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-extrabold gradient-text">Create Account</h2>
+                <p class="mt-2 text-gray-400">Join AuraStays today</p>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="mb-4 p-4 bg-red-500/10 border border-red-500 rounded-lg">
+                    <p class="text-red-400 text-sm">@Model.ErrorMessage</p>
+                </div>
+            }
+
+            <form method="post" class="space-y-6">
+                <!-- Account Type Selection -->
+                <div class="bg-gray-800/50 rounded-lg p-6 border border-gray-700">
+                    <label class="block text-sm font-medium text-gray-300 mb-4">I want to register as:</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <label class="relative flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-700/30 transition-colors"
+                               id="customer-option">
+                            <input type="radio" 
+                                   asp-for="Input.AccountType" 
+                                   value="Customer" 
+                                   class="w-5 h-5 text-indigo-600"
+                                   checked
+                                   onchange="toggleHotelFields()" />
+                            <div class="ml-4">
+                                <span class="block text-lg font-semibold text-white">Customer</span>
+                                <span class="block text-sm text-gray-400">Book and review hotels</span>
+                            </div>
+                        </label>
+
+                        <label class="relative flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-700/30 transition-colors"
+                               id="hotel-admin-option">
+                            <input type="radio" 
+                                   asp-for="Input.AccountType" 
+                                   value="HotelAdmin" 
+                                   class="w-5 h-5 text-indigo-600"
+                                   onchange="toggleHotelFields()" />
+                            <div class="ml-4">
+                                <span class="block text-lg font-semibold text-white">Hotel Manager</span>
+                                <span class="block text-sm text-gray-400">Manage your hotel</span>
+                            </div>
+                        </label>
+                    </div>
+                    <span asp-validation-for="Input.AccountType" class="text-red-400 text-sm"></span>
+                </div>
+
+                <!-- Basic User Information -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-300 mb-2">Username</label>
+                        <input asp-for="Input.Username" 
+                               type="text" 
+                               class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white"
+                               required />
+                        <span asp-validation-for="Input.Username" class="text-red-400 text-sm"></span>
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                        <input asp-for="Input.Email" 
+                               type="email" 
+                               class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white"
+                               required />
+                        <span asp-validation-for="Input.Email" class="text-red-400 text-sm"></span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                        <input asp-for="Input.Password" 
+                               type="password" 
+                               class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white"
+                               required />
+                        <span asp-validation-for="Input.Password" class="text-red-400 text-sm"></span>
+                    </div>
+
+                    <div>
+                        <label for="confirmPassword" class="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+                        <input asp-for="Input.ConfirmPassword" 
+                               type="password" 
+                               class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white"
+                               required />
+                        <span asp-validation-for="Input.ConfirmPassword" class="text-red-400 text-sm"></span>
+                    </div>
+                </div>
+
+                <!-- Hotel Information (shown only for Hotel Managers) -->
+                <div id="hotel-fields" class="hidden space-y-6 bg-blue-500/10 border border-blue-500/30 rounded-lg p-6">
+                    <h3 class="text-xl font-bold text-white mb-4">Hotel Information</h3>
+                    <p class="text-sm text-gray-400 mb-4">Your hotel will be pending admin approval before you can access the system.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label asp-for="Input.HotelName" class="block text-sm font-medium text-gray-300 mb-2"></label>
+                            <input asp-for="Input.HotelName" 
+                                   type="text" 
+                                   class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white"
+                                   placeholder="e.g., Grand Luxury Hotel" />
+                            <span asp-validation-for="Input.HotelName" class="text-red-400 text-sm"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="Input.HotelCity" class="block text-sm font-medium text-gray-300 mb-2"></label>
+                            <input asp-for="Input.HotelCity" 
+                                   type="text" 
+                                   class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white"
+                                   placeholder="e.g., Paris" />
+                            <span asp-validation-for="Input.HotelCity" class="text-red-400 text-sm"></span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label asp-for="Input.HotelCountry" class="block text-sm font-medium text-gray-300 mb-2"></label>
+                            <input asp-for="Input.HotelCountry" 
+                                   type="text" 
+                                   class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white"
+                                   placeholder="e.g., France" />
+                            <span asp-validation-for="Input.HotelCountry" class="text-red-400 text-sm"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="Input.HotelPhone" class="block text-sm font-medium text-gray-300 mb-2"></label>
+                            <input asp-for="Input.HotelPhone" 
+                                   type="tel" 
+                                   class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white"
+                                   placeholder="e.g., +33-1-23-45-67-89" />
+                            <span asp-validation-for="Input.HotelPhone" class="text-red-400 text-sm"></span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label asp-for="Input.HotelAddress" class="block text-sm font-medium text-gray-300 mb-2"></label>
+                        <input asp-for="Input.HotelAddress" 
+                               type="text" 
+                               class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white"
+                               placeholder="e.g., 123 Main Street" />
+                        <span asp-validation-for="Input.HotelAddress" class="text-red-400 text-sm"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="Input.HotelDescription" class="block text-sm font-medium text-gray-300 mb-2"></label>
+                        <textarea asp-for="Input.HotelDescription" 
+                                  rows="3"
+                                  class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white"
+                                  placeholder="Describe your hotel..."></textarea>
+                        <span asp-validation-for="Input.HotelDescription" class="text-red-400 text-sm"></span>
+                    </div>
+                </div>
+
+                <button type="submit" 
+                        class="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-300 transform hover:scale-105">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-gray-400 text-sm">
+                    Already have an account? 
+                    <a asp-page="/Account/Login" class="text-indigo-400 hover:text-indigo-300 font-medium">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function toggleHotelFields() {
+            const hotelFields = document.getElementById('hotel-fields');
+            const hotelAdminRadio = document.querySelector('input[value="HotelAdmin"]');
+            const customerOption = document.getElementById('customer-option');
+            const hotelAdminOption = document.getElementById('hotel-admin-option');
+            
+            if (hotelAdminRadio.checked) {
+                hotelFields.classList.remove('hidden');
+                hotelAdminOption.classList.add('border-indigo-500', 'bg-indigo-500/10');
+                customerOption.classList.remove('border-indigo-500', 'bg-indigo-500/10');
+            } else {
+                hotelFields.classList.add('hidden');
+                customerOption.classList.add('border-indigo-500', 'bg-indigo-500/10');
+                hotelAdminOption.classList.remove('border-indigo-500', 'bg-indigo-500/10');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleHotelFields();
+        });
+    </script>
+}

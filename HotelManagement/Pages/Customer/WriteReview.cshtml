@@ -1,0 +1,112 @@
+﻿@page
+@model HotelManagement.Pages.Customer.WriteReviewModel
+@{
+    ViewData["Title"] = "Write a Review";
+}
+
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-2xl mx-auto">
+        <div class="mb-8">
+            <a asp-page="/Customer/MyReservations" class="text-indigo-400 hover:text-indigo-300 font-medium flex items-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Reservations
+            </a>
+            <h1 class="text-4xl font-extrabold gradient-text">Write a Review</h1>
+            <p class="text-gray-400 mt-2">Share your experience with other travelers</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="mb-6 p-4 bg-red-500/10 border border-red-500 rounded-lg">
+                <p class="text-red-400">@Model.ErrorMessage</p>
+            </div>
+        }
+
+        @if (Model.EligibleHotels.Any())
+        {
+            <div class="glassmorphism rounded-xl p-8">
+                <form method="post">
+                    <div class="space-y-6">
+                        <div>
+                            <label asp-for="Input.HotelId" class="block text-sm font-medium text-gray-300 mb-2">Select Hotel</label>
+                            <select asp-for="Input.HotelId" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white">
+                                <option value="">Choose a hotel...</option>
+                                @foreach (var hotel in Model.EligibleHotels)
+                                {
+                                    <option value="@hotel.HotelId">@hotel.Name - @hotel.City</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Input.HotelId" class="text-red-400 text-sm"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="Input.Rating" class="block text-sm font-medium text-gray-300 mb-2">Rating</label>
+                            <div class="flex space-x-2">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    var starId = $"star{i}";
+                                    <input type="radio" asp-for="Input.Rating" value="@i" id="@starId" class="hidden peer/@starId" />
+                                    <label for="@starId" class="cursor-pointer text-4xl text-gray-600 hover:text-yellow-400 peer-checked/@starId:text-yellow-400">★</label>
+                                }
+                            </div>
+                            <span asp-validation-for="Input.Rating" class="text-red-400 text-sm"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="Input.Comment" class="block text-sm font-medium text-gray-300 mb-2">Your Review</label>
+                            <textarea asp-for="Input.Comment" 
+                                      rows="6" 
+                                      class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white"
+                                      placeholder="Tell us about your experience..."></textarea>
+                            <span asp-validation-for="Input.Comment" class="text-red-400 text-sm"></span>
+                            <p class="text-sm text-gray-500 mt-1">Minimum 10 characters, maximum 1000 characters</p>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-6 border-t border-gray-700">
+                            <a asp-page="/Customer/MyReservations" class="text-gray-400 hover:text-white transition-colors">Cancel</a>
+                            <button type="submit" class="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg hover:opacity-90 transition-all">
+                                Submit Review
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div class="glassmorphism rounded-xl p-12 text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mx-auto text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                <h3 class="text-2xl font-bold text-white mb-2">No Hotels to Review</h3>
+                <p class="text-gray-400 mb-6">You can write reviews for hotels where you've completed a stay.</p>
+                <a asp-page="/Customer/BookRoom" class="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg hover:opacity-90 transition-all">
+                    Book a Stay
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Star rating interaction
+        document.querySelectorAll('[id^="star"]').forEach(star => {
+            star.addEventListener('change', function() {
+                const rating = this.value;
+                document.querySelectorAll('[id^="star"]').forEach((s, idx) => {
+                    if (idx < rating) {
+                        s.nextElementSibling.classList.add('text-yellow-400');
+                        s.nextElementSibling.classList.remove('text-gray-600');
+                    } else {
+                        s.nextElementSibling.classList.remove('text-yellow-400');
+                        s.nextElementSibling.classList.add('text-gray-600');
+                    }
+                });
+            });
+        });
+    </script>
+}

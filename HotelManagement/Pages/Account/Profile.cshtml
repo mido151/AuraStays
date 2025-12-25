@@ -1,0 +1,91 @@
+﻿@page
+@model HotelManagement.Pages.Account.ProfileModel
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-4xl font-extrabold mb-8 gradient-text">My Profile</h1>
+
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="mb-6 p-4 bg-green-500/10 border border-green-500 rounded-lg">
+                <p class="text-green-400">@Model.SuccessMessage</p>
+            </div>
+        }
+
+        <div class="glassmorphism rounded-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold mb-6 text-white">Account Information</h2>
+            
+            <div class="space-y-4">
+                <div class="flex justify-between items-center border-b border-gray-700 pb-4">
+                    <span class="text-gray-400">Username</span>
+                    <span class="text-white font-medium">@Model.CurrentUser?.Username</span>
+                </div>
+                
+                <div class="flex justify-between items-center border-b border-gray-700 pb-4">
+                    <span class="text-gray-400">Email</span>
+                    <span class="text-white font-medium">@Model.CurrentUser?.Email</span>
+                </div>
+                
+                <div class="flex justify-between items-center border-b border-gray-700 pb-4">
+                    <span class="text-gray-400">Role</span>
+                    <span class="px-3 py-1 bg-indigo-500/10 text-indigo-400 rounded-full text-sm font-medium">
+                        @Model.CurrentUser?.Role
+                    </span>
+                </div>
+                
+                <div class="flex justify-between items-center border-b border-gray-700 pb-4">
+                    <span class="text-gray-400">Member Since</span>
+                    <span class="text-white font-medium">@Model.CurrentUser?.CreatedAt.ToString("MMMM dd, yyyy")</span>
+                </div>
+
+                @if (Model.CurrentUser?.Role == "Customer" && Model.GuestInfo != null)
+                {
+                    <div class="flex justify-between items-center border-b border-gray-700 pb-4">
+                        <span class="text-gray-400">Full Name</span>
+                        <span class="text-white font-medium">@Model.GuestInfo.FirstName @Model.GuestInfo.LastName</span>
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(Model.GuestInfo.LoyaltyId))
+                    {
+                        <div class="flex justify-between items-center border-b border-gray-700 pb-4">
+                            <span class="text-gray-400">Loyalty ID</span>
+                            <span class="text-white font-medium">@Model.GuestInfo.LoyaltyId</span>
+                        </div>
+                    }
+                }
+
+                @if (Model.CurrentUser?.Role == "HotelAdmin" && Model.CurrentUser.HotelId.HasValue)
+                {
+                    <div class="flex justify-between items-center border-b border-gray-700 pb-4">
+                        <span class="text-gray-400">Assigned Hotel</span>
+                        <span class="text-white font-medium">@Model.HotelName</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @if (Model.CurrentUser?.Role == "Customer")
+        {
+            <div class="glassmorphism rounded-xl p-8">
+                <h2 class="text-2xl font-bold mb-6 text-white">Quick Stats</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-indigo-400">@Model.TotalReservations</div>
+                        <div class="text-gray-400 text-sm mt-2">Total Bookings</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-green-400">@Model.CompletedReservations</div>
+                        <div class="text-gray-400 text-sm mt-2">Completed Stays</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-yellow-400">@Model.PendingReservations</div>
+                        <div class="text-gray-400 text-sm mt-2">Upcoming Trips</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

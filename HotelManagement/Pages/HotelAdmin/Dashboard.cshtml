@@ -1,0 +1,245 @@
+﻿@page
+@model HotelManagement.Pages.HotelAdmin.DashboardModel
+@{
+    ViewData["Title"] = "Hotel Dashboard";
+}
+
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    @if (Model.Hotel != null)
+    {
+        <div class="mb-10">
+            <h1 class="text-4xl font-extrabold mb-2">
+                <span class="gradient-text">@Model.Hotel.Name</span>
+            </h1>
+            <p class="text-gray-400">@Model.Hotel.City, @Model.Hotel.Country</p>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="mb-6 p-4 bg-green-500/10 border border-green-500 rounded-lg">
+            <p class="text-green-400">@Model.SuccessMessage</p>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="mb-6 p-4 bg-red-500/10 border border-red-500 rounded-lg">
+            <p class="text-red-400">@Model.ErrorMessage</p>
+        </div>
+    }
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div class="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-gray-400 font-medium">Total Rooms</h3>
+                <div class="p-2 bg-purple-500/10 rounded-lg text-purple-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                </div>
+            </div>
+            <p class="text-3xl font-bold text-white">@Model.TotalRooms</p>
+        </div>
+
+        <div class="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-gray-400 font-medium">Occupied</h3>
+                <div class="p-2 bg-red-500/10 rounded-lg text-red-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+            </div>
+            <p class="text-3xl font-bold text-white">@Model.OccupiedRooms</p>
+            <span class="text-sm text-gray-400 mt-2 block">@((Model.TotalRooms > 0 ? (Model.OccupiedRooms * 100 / Model.TotalRooms) : 0))% occupancy</span>
+        </div>
+
+        <div class="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-gray-400 font-medium">Available</h3>
+                <div class="p-2 bg-green-500/10 rounded-lg text-green-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                    </svg>
+                </div>
+            </div>
+            <p class="text-3xl font-bold text-white">@Model.AvailableRooms</p>
+            <span class="text-sm text-green-400 mt-2 block flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Ready for booking
+            </span>
+        </div>
+
+        <div class="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-gray-400 font-medium">Today's Activity</h3>
+                <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-2xl font-bold text-white">@Model.TodayCheckIns</p>
+                    <span class="text-xs text-gray-400">Check-ins</span>
+                </div>
+                <div class="text-right">
+                    <p class="text-2xl font-bold text-white">@Model.TodayCheckOuts</p>
+                    <span class="text-xs text-gray-400">Check-outs</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Guests Section -->
+    <div class="glassmorphism rounded-xl p-8 mb-8">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-3xl font-bold gradient-text">Current Guests</h2>
+            <span class="text-sm text-gray-400">@Model.CurrentGuests.Count active reservations</span>
+        </div>
+
+        @if (Model.CurrentGuests.Any())
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-700">
+                            <th class="text-left py-3 px-4 text-gray-400 font-medium">Guest Name</th>
+                            <th class="text-left py-3 px-4 text-gray-400 font-medium">Room</th>
+                            <th class="text-left py-3 px-4 text-gray-400 font-medium">Check-In</th>
+                            <th class="text-left py-3 px-4 text-gray-400 font-medium">Check-Out</th>
+                            <th class="text-left py-3 px-4 text-gray-400 font-medium">Nights</th>
+                            <th class="text-left py-3 px-4 text-gray-400 font-medium">Days Left</th>
+                            <th class="text-center py-3 px-4 text-gray-400 font-medium">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var guest in Model.CurrentGuests)
+                        {
+                            <tr class="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
+                                <td class="py-4 px-4 text-white font-medium">@guest.GuestName</td>
+                                <td class="py-4 px-4 text-cyan-400 font-semibold">@guest.RoomNumber</td>
+                                <td class="py-4 px-4 text-gray-300">@guest.CheckInDate.ToString("MMM dd, yyyy")</td>
+                                <td class="py-4 px-4 text-gray-300">@guest.CheckOutDate.ToString("MMM dd, yyyy")</td>
+                                <td class="py-4 px-4 text-gray-300">@guest.TotalNights</td>
+                                <td class="py-4 px-4">
+                                    @if (guest.RemainingDays == 0)
+                                    {
+                                        <span class="px-3 py-1 bg-yellow-500/10 text-yellow-400 rounded-full text-sm font-medium">Today</span>
+                                    }
+                                    else if (guest.RemainingDays == 1)
+                                    {
+                                        <span class="px-3 py-1 bg-orange-500/10 text-orange-400 rounded-full text-sm font-medium">1 day</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full text-sm font-medium">@guest.RemainingDays days</span>
+                                    }
+                                </td>
+                                <td class="py-4 px-4 text-center">
+                                    <form method="post" asp-page-handler="CheckOut" asp-route-reservationId="@guest.ReservationId" class="inline">
+                                        <button type="submit" 
+                                                class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-sm font-semibold rounded-lg hover:opacity-90 transition-all"
+                                                onclick="return confirm('Are you sure you want to check out this guest?');">
+                                            Check Out
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-12">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <p class="text-gray-400 text-lg">No current guests</p>
+                <p class="text-gray-500 text-sm mt-2">Guests will appear here once they check in</p>
+            </div>
+        }
+    </div>
+
+    <!-- Quick Actions -->
+    <h2 class="text-2xl font-bold mb-6">Quick Actions</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <a asp-page="/HotelAdmin/Rooms/Index" class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-indigo-600 to-purple-700 p-8 transition-all hover:shadow-2xl hover:scale-[1.02]">
+            <div class="relative z-10">
+                <h3 class="text-2xl font-bold text-white mb-2">Manage Rooms</h3>
+                <p class="text-indigo-100">Add, edit, or remove rooms</p>
+            </div>
+            <svg class="absolute -bottom-4 -right-4 h-32 w-32 text-white/10 rotate-12 group-hover:scale-110 transition-transform" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+        </a>
+
+        <a asp-page="/HotelAdmin/Staff/Index" class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-teal-600 to-emerald-700 p-8 transition-all hover:shadow-2xl hover:scale-[1.02]">
+            <div class="relative z-10">
+                <h3 class="text-2xl font-bold text-white mb-2">Manage Staff</h3>
+                <p class="text-teal-100">View and manage employees</p>
+            </div>
+            <svg class="absolute -bottom-4 -right-4 h-32 w-32 text-white/10 rotate-12 group-hover:scale-110 transition-transform" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+        </a>
+
+        <a asp-page="/HotelAdmin/Reservations/Index" class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-pink-600 to-rose-700 p-8 transition-all hover:shadow-2xl hover:scale-[1.02]">
+            <div class="relative z-10">
+                <h3 class="text-2xl font-bold text-white mb-2">Reservations</h3>
+                <p class="text-pink-100">View all bookings</p>
+            </div>
+            <svg class="absolute -bottom-4 -right-4 h-32 w-32 text-white/10 rotate-12 group-hover:scale-110 transition-transform" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+        </a>
+    </div>
+
+    <!-- Staff Overview -->
+    <div class="glassmorphism rounded-xl p-8">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-3xl font-bold gradient-text">Staff Overview</h2>
+            <a asp-page="/HotelAdmin/Staff/Create" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg hover:opacity-90 transition-all">
+                + Add Staff
+            </a>
+        </div>
+
+        @if (Model.Staff.Any())
+        {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach (var staff in Model.Staff.Take(6))
+                {
+                    <div class="bg-gray-800/50 rounded-lg p-4">
+                        <h4 class="text-lg font-semibold text-white">@staff.FirstName @staff.LastName</h4>
+                        <p class="text-sm text-gray-400">@(staff.Department?.Name ?? "No Department")</p>
+                        <p class="text-xs text-gray-500 mt-1">@staff.Email</p>
+                    </div>
+                }
+            </div>
+            @if (Model.Staff.Count > 6)
+            {
+                <div class="text-center mt-6">
+                    <a asp-page="/HotelAdmin/Staff/Index" class="text-indigo-400 hover:text-indigo-300 font-medium">
+                        View all @Model.Staff.Count staff members →
+                    </a>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center py-8">
+                <p class="text-gray-400">No staff members found</p>
+                <a asp-page="/HotelAdmin/Staff/Create" class="text-indigo-400 hover:text-indigo-300 font-medium mt-2 inline-block">
+                    Add your first staff member
+                </a>
+            </div>
+        }
+    </div>
+</div>

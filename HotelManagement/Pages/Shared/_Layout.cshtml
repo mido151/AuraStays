@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Hotel Management System</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="bg-gray-900 text-gray-200 font-sans">
+    <div class="min-h-screen flex flex-col">
+        
+        <header class="glassmorphism sticky top-0 z-50">
+            <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex-shrink-0">
+                        <a asp-page="/Index" class="text-2xl font-bold">
+                            <span class="gradient-text">AuraStays</span>
+                        </a>
+                    </div>
+
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        @* Authenticated User Navigation *@
+                        <div class="hidden md:flex items-center space-x-4">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                @* Admin Navigation *@
+                                <a asp-page="/Admin/Dashboard" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Dashboard</a>
+                                <a asp-page="/Hotels" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Hotels</a>
+                            }
+                            else if (User.IsInRole("HotelAdmin"))
+                            {
+                                @* Hotel Admin Navigation *@
+                                <a asp-page="/HotelAdmin/Dashboard" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Dashboard</a>
+                                <a asp-page="/HotelAdmin/Rooms/Index" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Rooms</a>
+                                <a asp-page="/HotelAdmin/Staff/Index" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Staff</a>
+                            }
+                            else if (User.IsInRole("Customer"))
+                            {
+                                @* Customer Navigation *@
+                                <a asp-page="/Index" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Home</a>
+                                <a asp-page="/Hotels" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Hotels</a>
+                                <a asp-page="/Customer/BookRoom" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Book Room</a>
+                                <a asp-page="/Customer/MyReservations" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">My Reservations</a>
+                            }
+
+                            @* User Info & Actions *@
+                            <a asp-page="/Account/Profile" class="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                @User.Identity?.Name
+                            </a>
+                            <a href="/Account/Logout" class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors inline-block">Sign Out</a>
+                        </div>
+                    }
+                    else
+                    {
+                        @* Guest (Not Logged In) Navigation *@
+                        <div class="hidden md:flex items-center space-x-4">
+                            <a asp-page="/Index" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Home</a>
+                            <a asp-page="/Hotels" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Hotels</a>
+                            <a asp-page="/Rooms" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Rooms</a>
+                            <a asp-page="/About" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">About</a>
+                            <a asp-page="/Account/Login" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-lg hover:opacity-90 transition-all">Sign In</a>
+                            <a asp-page="/Account/Register" class="px-4 py-2 border border-indigo-500 text-indigo-400 font-medium rounded-lg hover:bg-indigo-500 hover:text-white transition-all">Sign Up</a>
+                        </div>
+                    }
+
+                    <div class="md:hidden">
+                        <button id="mobile-menu-button" class="text-gray-300 hover:text-white focus:outline-none">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                @* Mobile Menu *@
+                <div id="mobile-menu" class="hidden md:hidden pb-4">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <div class="border-t border-gray-700 pt-4">
+                            <div class="px-3 py-2 text-sm text-gray-500">Signed in as: <span class="text-white">@User.Identity?.Name</span></div>
+                        </div>
+                        
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-page="/Admin/Dashboard" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Dashboard</a>
+                            <a asp-page="/Hotels" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Hotels</a>
+                        }
+                        else if (User.IsInRole("HotelAdmin"))
+                        {
+                            <a asp-page="/HotelAdmin/Dashboard" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Dashboard</a>
+                            <a asp-page="/HotelAdmin/Rooms/Index" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Rooms</a>
+                            <a asp-page="/HotelAdmin/Staff/Index" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Staff</a>
+                        }
+                        else if (User.IsInRole("Customer"))
+                        {
+                            <a asp-page="/Index" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Home</a>
+                            <a asp-page="/Hotels" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Hotels</a>
+                            <a asp-page="/Customer/BookRoom" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Book Room</a>
+                            <a asp-page="/Customer/MyReservations" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">My Reservations</a>
+                        }
+                        
+                        <form method="post" asp-page="/Account/Logout" class="block px-3 py-2">
+                            <button type="submit" class="w-full text-left rounded-md text-base font-medium text-red-400 hover:bg-gray-700">
+                                Sign Out
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a asp-page="/Index" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Home</a>
+                        <a asp-page="/Hotels" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Hotels</a>
+                        <a asp-page="/Rooms" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Rooms</a>
+                        <a asp-page="/About" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">About</a>
+                        <div class="mt-4 space-y-2">
+                            <a asp-page="/Account/Login" class="block mx-3 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-center font-medium rounded-lg hover:opacity-90">Sign In</a>
+                            <a asp-page="/Account/Register" class="block mx-3 px-4 py-2 border border-indigo-500 text-indigo-400 text-center font-medium rounded-lg hover:bg-indigo-500 hover:text-white">Sign Up</a>
+                        </div>
+                    }
+                </div>
+            </nav>
+        </header>
+
+        <main class="flex-grow w-full">
+            @RenderBody()
+        </main>
+
+        <footer class="bg-gray-800/50 border-t border-gray-700 mt-auto">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-400">
+                <p>&copy; 2023 AuraStays. All rights reserved. Designed for the modern traveler.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    
+    <script>
+        // Mobile menu toggle
+        const btn = document.getElementById('mobile-menu-button');
+        const menu = document.getElementById('mobile-menu');
+        if(btn && menu) {
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+            });
+        }
+    </script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
