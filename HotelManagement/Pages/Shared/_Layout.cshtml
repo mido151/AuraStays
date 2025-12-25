@@ -3,7 +3,10 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Hotel Management System</title>
+    <title>@ViewData["Title"] - AuraStays Hotel Management</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🏨%3C/text%3E%3C/svg%3E">
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -12,46 +15,150 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    
+    <style>
+        /* Toast Notification Styles */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+        }
+        
+        .toast {
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-in 4.7s;
+            backdrop-filter: blur(10px);
+        }
+        
+        .toast-success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.95));
+            border: 1px solid rgba(16, 185, 129, 0.5);
+        }
+        
+        .toast-error {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95));
+            border: 1px solid rgba(239, 68, 68, 0.5);
+        }
+        
+        .toast-warning {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.95), rgba(245, 158, 11, 0.95));
+            border: 1px solid rgba(251, 191, 36, 0.5);
+        }
+        
+        .toast-info {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(37, 99, 235, 0.95));
+            border: 1px solid rgba(59, 130, 246, 0.5);
+        }
+        
+        
+        
+        
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        
+        
+        /* Button Loading State */
+        button.loading {
+            position: relative;
+            color: transparent !important;
+            pointer-events: none;
+        }
+        
+        button.loading::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Enhanced Form Validation */
+        .input-error {
+            border-color: #ef4444 !important;
+            animation: shake 0.3s;
+        }
+        
+       
+        
+        /* Success Flash Animation */
+        .flash-success {
+            animation: flash-green 0.5s ease-in-out;
+        }
+        
+        
+        
+        /* Pulse Animation for Important Elements */
+        .pulse-once {
+            animation: pulse 1s ease-in-out;
+        }
+        
+        
+    </style>
 </head>
 <body class="bg-gray-900 text-gray-200 font-sans">
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+    
     <div class="min-h-screen flex flex-col">
         
         <header class="glassmorphism sticky top-0 z-50">
             <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex-shrink-0">
-                        <a asp-page="/Index" class="text-2xl font-bold">
+                        <a asp-page="/Index" class="text-2xl font-bold flex items-center gap-2">
+                            <span class="text-3xl">🏨</span>
                             <span class="gradient-text">AuraStays</span>
                         </a>
                     </div>
 
                     @if (User.Identity?.IsAuthenticated == true)
                     {
-                        @* Authenticated User Navigation *@
                         <div class="hidden md:flex items-center space-x-4">
                             @if (User.IsInRole("Admin"))
                             {
-                                @* Admin Navigation *@
                                 <a asp-page="/Admin/Dashboard" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Dashboard</a>
                                 <a asp-page="/Hotels" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Hotels</a>
                             }
                             else if (User.IsInRole("HotelAdmin"))
                             {
-                                @* Hotel Admin Navigation *@
                                 <a asp-page="/HotelAdmin/Dashboard" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Dashboard</a>
                                 <a asp-page="/HotelAdmin/Rooms/Index" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Rooms</a>
                                 <a asp-page="/HotelAdmin/Staff/Index" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Staff</a>
                             }
                             else if (User.IsInRole("Customer"))
                             {
-                                @* Customer Navigation *@
                                 <a asp-page="/Index" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Home</a>
                                 <a asp-page="/Hotels" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Hotels</a>
                                 <a asp-page="/Customer/BookRoom" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Book Room</a>
                                 <a asp-page="/Customer/MyReservations" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">My Reservations</a>
                             }
 
-                            @* User Info & Actions *@
                             <a asp-page="/Account/Profile" class="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -63,7 +170,6 @@
                     }
                     else
                     {
-                        @* Guest (Not Logged In) Navigation *@
                         <div class="hidden md:flex items-center space-x-4">
                             <a asp-page="/Index" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Home</a>
                             <a asp-page="/Hotels" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Hotels</a>
@@ -83,7 +189,6 @@
                     </div>
                 </div>
 
-                @* Mobile Menu *@
                 <div id="mobile-menu" class="hidden md:hidden pb-4">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
@@ -137,7 +242,7 @@
 
         <footer class="bg-gray-800/50 border-t border-gray-700 mt-auto">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-400">
-                <p>&copy; 2023 AuraStays. All rights reserved. Designed for the modern traveler.</p>
+                <p>&copy; 2024 AuraStays. All rights reserved. Designed for the modern traveler.</p>
             </div>
         </footer>
     </div>
@@ -146,14 +251,105 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     
     <script>
-        // Mobile menu toggle
-        const btn = document.getElementById('mobile-menu-button');
-        const menu = document.getElementById('mobile-menu');
-        if(btn && menu) {
-            btn.addEventListener('click', () => {
-                menu.classList.toggle('hidden');
-            });
+        // Toast Notification System
+        function showToast(message, type = 'info', duration = 5000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            const icons = {
+                success: '✓',
+                error: '✗',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+            
+            toast.innerHTML = `
+                <div class="text-2xl">${icons[type]}</div>
+                <div class="flex-1 text-white font-medium">${message}</div>
+                <button onclick="this.parentElement.remove()" class="text-white hover:text-gray-200">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, duration);
         }
+        
+        // Show toast for TempData messages
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for success messages
+            const successMsg = document.querySelector('[data-success-message]');
+            if (successMsg) {
+                showToast(successMsg.getAttribute('data-success-message'), 'success');
+            }
+            
+            // Check for error messages
+            const errorMsg = document.querySelector('[data-error-message]');
+            if (errorMsg) {
+                showToast(errorMsg.getAttribute('data-error-message'), 'error');
+            }
+            
+            // Mobile menu toggle
+            const btn = document.getElementById('mobile-menu-button');
+            const menu = document.getElementById('mobile-menu');
+            if(btn && menu) {
+                btn.addEventListener('click', () => {
+                    menu.classList.toggle('hidden');
+                });
+            }
+        });
+        
+        // Form Submit Loading State
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (form.tagName === 'FORM' && !form.hasAttribute('data-no-loading')) {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn && !submitBtn.classList.contains('loading')) {
+                    submitBtn.classList.add('loading');
+                    submitBtn.disabled = true;
+                    
+                    // Re-enable after 5 seconds as fallback
+                    setTimeout(() => {
+                        submitBtn.classList.remove('loading');
+                        submitBtn.disabled = false;
+                    }, 5000);
+                }
+            }
+        });
+        
+        // Enhanced Form Validation
+        document.addEventListener('invalid', function(e) {
+            e.preventDefault();
+            const input = e.target;
+            input.classList.add('input-error');
+            setTimeout(() => input.classList.remove('input-error'), 300);
+        }, true);
+        
+        // Remove error class on input
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('input-error')) {
+                e.target.classList.remove('input-error');
+            }
+        });
+        
+        // Global success flash for important actions
+        function flashSuccess(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.classList.add('flash-success');
+                setTimeout(() => element.classList.remove('flash-success'), 500);
+            }
+        }
+        
+        // Expose toast function globally
+        window.showToast = showToast;
+        window.flashSuccess = flashSuccess;
     </script>
     
     @await RenderSectionAsync("Scripts", required: false)

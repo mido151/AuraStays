@@ -28,15 +28,15 @@ namespace HotelManagement.Pages.Account
         public class InputModel
         {
             [Required(ErrorMessage = "Username is required")]
-            [StringLength(50, MinimumLength = 3)]
+            [StringLength(50, MinimumLength = 3, ErrorMessage = "Username must be between 3 and 50 characters")]
             public string Username { get; set; } = string.Empty;
 
             [Required(ErrorMessage = "Email is required")]
-            [EmailAddress]
+            [EmailAddress(ErrorMessage = "Please enter a valid email address")]
             public string Email { get; set; } = string.Empty;
 
             [Required(ErrorMessage = "Password is required")]
-            [StringLength(100, MinimumLength = 6)]
+            [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters long")]
             [DataType(DataType.Password)]
             public string Password { get; set; } = string.Empty;
 
@@ -70,10 +70,14 @@ namespace HotelManagement.Pages.Account
 
         public void OnGet()
         {
+            _logger.LogInformation("Registration page accessed");
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+            _logger.LogInformation("Registration attempt for username: {Username}, AccountType: {AccountType}",
+                Input.Username, Input.AccountType);
+
             // Validate hotel fields if user wants to be hotel admin
             if (Input.AccountType == "HotelAdmin")
             {
@@ -97,13 +101,16 @@ namespace HotelManagement.Pages.Account
 
             if (!ModelState.IsValid)
             {
+                ErrorMessage = "Please correct the errors and try again.";
                 return Page();
             }
 
             // Check if user already exists
             if (await _authService.UserExistsAsync(Input.Username, Input.Email))
             {
-                ErrorMessage = "Username or email already exists.";
+                _logger.LogWarning("Registration failed - Username or email already exists: {Username}, {Email}",
+                    Input.Username, Input.Email);
+                ErrorMessage = "Username or email already exists. Please choose different credentials.";
                 return Page();
             }
 
@@ -111,7 +118,9 @@ namespace HotelManagement.Pages.Account
             {
                 if (Input.AccountType == "HotelAdmin")
                 {
-                    // Create hotel first WITHOUT transaction (let EF handle it)
+                    _logger.LogInformation("Creating hotel for new hotel admin: {HotelName}", Input.HotelName);
+
+                    // Create hotel first
                     var hotel = new HotelEntity
                     {
                         Name = Input.HotelName!,
@@ -127,10 +136,10 @@ namespace HotelManagement.Pages.Account
                     _context.Hotels.Add(hotel);
                     await _context.SaveChangesAsync();
 
-                    _logger.LogInformation($"Hotel created successfully: {hotel.Name} (ID: {hotel.HotelId})");
+                    _logger.LogInformation("Hotel created successfully: {HotelName} (ID: {HotelId})",
+                        hotel.Name, hotel.HotelId);
 
                     // Register hotel admin user and link to hotel
-                    // AuthService will handle its own transaction
                     var user = await _authService.RegisterAsync(
                         Input.Username,
                         Input.Email,
@@ -141,7 +150,7 @@ namespace HotelManagement.Pages.Account
 
                     if (user == null)
                     {
-                        // If user creation fails, delete the hotel
+                        _logger.LogError("Failed to create hotel admin user, rolling back hotel creation");
                         _context.Hotels.Remove(hotel);
                         await _context.SaveChangesAsync();
 
@@ -149,13 +158,18 @@ namespace HotelManagement.Pages.Account
                         return Page();
                     }
 
-                    _logger.LogInformation($"Hotel admin user created successfully: {user.Username} (ID: {user.UserId})");
+                    _logger.LogInformation("Hotel admin user created successfully: {Username} (ID: {UserId})",
+                        user.Username, user.UserId);
 
-                    TempData["SuccessMessage"] = "Registration successful! You can now log in and manage your hotel.";
+                    // SUCCESS - Set TempData for toast notification
+                    TempData["SuccessMessage"] = $"? Account created successfully! Welcome to AuraStays, {user.Username}! You can now log in and manage your hotel.";
+
                     return RedirectToPage("/Account/Login");
                 }
                 else
                 {
+                    _logger.LogInformation("Creating customer user: {Username}", Input.Username);
+
                     // Register regular customer user
                     var user = await _authService.RegisterAsync(
                         Input.Username,
@@ -166,27 +180,27 @@ namespace HotelManagement.Pages.Account
 
                     if (user == null)
                     {
+                        _logger.LogError("Failed to create customer user: {Username}", Input.Username);
                         ErrorMessage = "Registration failed. Username or email may already exist.";
                         return Page();
                     }
 
-                    _logger.LogInformation($"Customer user created successfully: {user.Username} (ID: {user.UserId})");
+                    _logger.LogInformation("Customer user created successfully: {Username} (ID: {UserId})",
+                        user.Username, user.UserId);
 
-                    TempData["SuccessMessage"] = "Registration successful! Please log in.";
+                    // SUCCESS - Set TempData for toast notification
+                    TempData["SuccessMessage"] = $"?? Account created successfully! Welcome to AuraStays, {user.Username}! Please log in to start booking.";
+
                     return RedirectToPage("/Account/Login");
                 }
             }
             catch (Exception ex)
             {
-                // Log detailed error
-                _logger.LogError(ex, "Registration error occurred");
+                _logger.LogError(ex, "Registration error occurred for user: {Username}", Input.Username);
 
-                // Display user-friendly error message
+                // Provide user-friendly error messages
                 if (ex.InnerException != null)
                 {
-                    _logger.LogError(ex.InnerException, "Inner exception details");
-
-                    // Check for common SQL errors
                     var innerMessage = ex.InnerException.Message.ToLower();
 
                     if (innerMessage.Contains("foreign key"))
@@ -212,7 +226,7 @@ namespace HotelManagement.Pages.Account
                 }
                 else
                 {
-                    ErrorMessage = $"Registration failed: {ex.Message}";
+                    ErrorMessage = "An unexpected error occurred during registration. Please try again.";
                 }
 
                 return Page();
